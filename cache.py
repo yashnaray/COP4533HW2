@@ -73,3 +73,29 @@ class OPTFFCache:
     
     def get_stats(self):
         return self.hits, self.misses
+
+def compare_policies(capacity, requests):
+    fifo = FIFOCache(capacity)
+    lru = LRUCache(capacity)
+    optff = OPTFFCache(capacity, requests)
+    
+    for req in requests:
+        fifo.request(req)
+        lru.request(req)
+        optff.request(req)
+    
+    return {
+        'FIFO': fifo.get_stats(),
+        'LRU': lru.get_stats(),
+        'OPTFF': optff.get_stats()
+    }
+
+if __name__ == '__main__':
+    with open('input.txt') as f:
+        k, m = map(int, f.readline().split())
+        requests = list(map(int, f.readline().split()))
+    
+    results = compare_policies(k, requests)
+    
+    for policy, (hits, misses) in results.items():
+        print(f"{policy}: {hits} hits, {misses} misses")
