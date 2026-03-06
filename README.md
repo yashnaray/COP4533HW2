@@ -74,18 +74,18 @@ For k = 3, it is possible for OPTFF to incur strictly fewer misses than LRU or F
 This results in 8 misses for LRU and FIFO, and 5 misses for OPTFF.
 
 ## Proof of OPTFF Optimality
-Let \(A\) be an optimal offline algorithm that minimizes cache misses. Let \((a_1,\dots,a_m)\) be the evictions made by \(A\) and \((e_1,\dots,e_m)\) those made by OPTFF. Assume they differ and let \(i\) be the first index where \(a_i \ne e_i\).
+Let A be an optimal offline algorithm that minimizes cache misses. Let (a1, ..., am) be the evictions made by A and (e1, ..., em) those made by OPTFF. Assume they differ and let i be the first index where ai != ei.
 
-Up to step \(i\), both algorithms have identical cache contents, so both \(a_i\) and \(e_i\) are present. Algorithm \(A\) could evict \(e_i\) instead of \(a_i\) without increasing misses.
+Up to step i, both algorithms have identical cache contents, so both ai and ei are present. Algorithm A could evict ei instead of ai without increasing misses.
 
 Four cases cover all outcomes:
 
-1. If \(e_i\) is never accessed again, the change causes no additional misses.
+1. If ei is never accessed again, the change causes no additional misses.
 
-2. If \(e_i\) would be evicted after \(a_i\) is accessed but before its next access, evict the same item that would have been evicted when \(a_i\) was accessed. The item's cache lifetime only increases, so misses do not increase.
+2. If ei would be evicted after ai is accessed but before its next access, evict the same item that would have been evicted when ai was accessed. The item's cache lifetime only increases, so misses do not increase.
 
-3. If \(e_i\) would be evicted before either \(e_i\) or \(a_i\) is accessed, evict \(a_i\) instead. Both end up absent from the cache, producing the same result.
+3. If ei would be evicted before either ei or ai is accessed, evict ai instead. Both end up absent from the cache, producing the same result.
 
-4. Otherwise, both would remain until their next access. Accessing \(e_i\) changes from a hit to a miss, while accessing \(a_i\) changes from a miss to a hit, leaving the total number of misses unchanged.
+4. Otherwise, both remain in the cache until their next access. Accessing ei changes from a hit to a miss, while accessing ai changes from a miss to a hit, so the total number of misses stays the same.
 
-Thus replacing \(a_i\) with \(e_i\) does not increase misses. Repeating this exchange wherever \(A\) and OPTFF differ converts \(A\) into OPTFF without worsening performance. Therefore OPTFF is optimal.
+Thus replacing ai with ei does not increase misses. Repeating this exchange wherever A and OPTFF differ converts A into OPTFF without worsening performance. Therefore OPTFF is optimal.
