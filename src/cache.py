@@ -1,39 +1,33 @@
 from collections import deque
+import sys
 
 class FIFOCache:
     def __init__(self, capacity):
         self.capacity = capacity
         self.cache = set()
         self.queue = deque()
-        self.hits = 0
         self.misses = 0
     
     def request(self, item):
         if item in self.cache:
-            self.hits += 1
-        else:
-            self.misses += 1
-            if len(self.cache) >= self.capacity:
-                evicted = self.queue.popleft()
-                self.cache.remove(evicted)
-            self.cache.add(item)
-            self.queue.append(item)
-    
-    def get_stats(self):
-        return self.hits, self.misses
+            return
+        self.misses += 1
+        if len(self.cache) >= self.capacity:
+            evicted = self.queue.popleft()
+            self.cache.remove(evicted)
+        self.cache.add(item)
+        self.queue.append(item)
 
 class LRUCache:
     def __init__(self, capacity):
         self.capacity = capacity
         self.cache = {}
-        self.hits = 0
         self.misses = 0
         self.time = 0
     
     def request(self, item):
         self.time += 1
         if item in self.cache:
-            self.hits += 1
             self.cache[item] = self.time
         else:
             self.misses += 1
@@ -41,22 +35,18 @@ class LRUCache:
                 lru_item = min(self.cache, key=self.cache.get)
                 del self.cache[lru_item]
             self.cache[item] = self.time
-    
-    def get_stats(self):
-        return self.hits, self.misses
 
 class OPTFFCache:
     def __init__(self, capacity, requests):
         self.capacity = capacity
         self.cache = set()
-        self.hits = 0
         self.misses = 0
         self.requests = requests
         self.index = 0
     
     def request(self, item):
         if item in self.cache:
-            self.hits += 1
+            pass
         else:
             self.misses += 1
             if len(self.cache) >= self.capacity:
@@ -70,32 +60,28 @@ class OPTFFCache:
             if self.requests[i] == item:
                 return i
         return float('inf')
-    
-    def get_stats(self):
-        return self.hits, self.misses
 
-def compare_policies(capacity, requests):
-    fifo = FIFOCache(capacity)
-    lru = LRUCache(capacity)
-    optff = OPTFFCache(capacity, requests)
+def main():
+    if len(sys.argv) != 2:
+        print("Usage: python cache.py <input_file>")
+        sys.exit(1)
+    
+    with open(sys.argv[1]) as f:
+        k, m = map(int, f.readline().split())
+        requests = list(map(int, f.readline().split()))
+    
+    fifo = FIFOCache(k)
+    lru = LRUCache(k)
+    optff = OPTFFCache(k, requests)
     
     for req in requests:
         fifo.request(req)
         lru.request(req)
         optff.request(req)
     
-    return {
-        'FIFO': fifo.get_stats(),
-        'LRU': lru.get_stats(),
-        'OPTFF': optff.get_stats()
-    }
+    print(f"FIFO  : {fifo.misses}")
+    print(f"LRU   : {lru.misses}")
+    print(f"OPTFF : {optff.misses}")
 
 if __name__ == '__main__':
-    with open('input.txt') as f:
-        k, m = map(int, f.readline().split())
-        requests = list(map(int, f.readline().split()))
-    
-    results = compare_policies(k, requests)
-    
-    for policy, (hits, misses) in results.items():
-        print(f"{policy}: {hits} hits, {misses} misses")
+    main()
